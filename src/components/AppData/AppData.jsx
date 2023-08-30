@@ -84,6 +84,7 @@ const initialAppData = {
     [WIDGET_STATE.pollInView]: "",
     [WIDGET_STATE.view]: "",
   },
+  showPollWidget: false,
 };
 
 export const AppData = React.memo(

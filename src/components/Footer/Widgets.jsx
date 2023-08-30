@@ -1,7 +1,7 @@
 // @ts-check
 import React from "react";
 import { QuizIcon } from "@100mslive/react-icons";
-import { Flex, Text } from "@100mslive/roomkit-react";
+import { Button, Flex, Text } from "@100mslive/roomkit-react";
 import { PollsQuizMenu } from "../Polls/CreatePollQuiz/PollsQuizMenu";
 import { CreateQuestions } from "../Polls/CreateQuestions/CreateQuestions";
 import { Voting } from "../Polls/Voting/Voting";
@@ -17,12 +17,23 @@ import {
 } from "../AppData/useUISettings";
 import { WIDGET_STATE, WIDGET_VIEWS } from "../../common/constants";
 
-export const Widgets = () => {
+export const Widgets = props => {
   const toggleWidget = useWidgetToggle();
   const { pollInView: pollID, widgetView, setWidgetState } = useWidgetState();
   const { showPolls } = useShowPolls();
   const { showWhiteboard } = useShowWhiteboard();
   const { showAudioShare } = useShowAudioShare();
+
+  const onClickShowPollData = () => {
+    console.log("Show Poll Data");
+    console.log(props.canShowPollWidget);
+  };
+
+  const renderPollVoting = () => {
+    if (props.canShowPollWidget === true && widgetView === WIDGET_VIEWS.VOTE) {
+      return <Voting toggleVoting={toggleWidget} id={pollID} />;
+    }
+  };
 
   return (
     <Container rounded>
@@ -54,9 +65,8 @@ export const Widgets = () => {
       )}
       {widgetView === WIDGET_VIEWS.CREATE_POLL_QUIZ && <PollsQuizMenu />}
       {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <CreateQuestions />}
-      {widgetView === WIDGET_VIEWS.VOTE && (
-        <Voting toggleVoting={toggleWidget} id={pollID} />
-      )}
+      {renderPollVoting()}
+      <Button onClick={onClickShowPollData}>Print poll data</Button>
     </Container>
   );
 };

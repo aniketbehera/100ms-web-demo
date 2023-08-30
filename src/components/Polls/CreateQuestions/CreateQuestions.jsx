@@ -40,6 +40,22 @@ export function CreateQuestions() {
       }));
     await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);
+    // Create a timed metadata event when a new poll is created.
+    const data = { showPollWidget: true };
+    await actions.sendHLSTimedMetadata([
+      {
+        payload: JSON.stringify(data),
+        duration: 2,
+      },
+    ]);
+
+    console.log("Timed Metadat sent");
+    console.log(data);
+    // console.log("Set showPollWidget to false");
+
+    console.log("Timed Metadat sent");
+    console.log(data);
+
     setWidgetView(WIDGET_VIEWS.VOTE);
   };
   const headingTitle = interaction?.type

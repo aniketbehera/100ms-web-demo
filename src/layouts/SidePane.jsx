@@ -10,6 +10,7 @@ import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
 
 const SidePane = ({ css = {} }) => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
+  const canShowPollWidget = useHMSStore(selectAppData("showPollWidget"));
   const { widgetView } = useWidgetState();
   const commonCss = {
     position: "absolute",
@@ -62,7 +63,7 @@ const SidePane = ({ css = {} }) => {
             "@lg": { ...commonCss["@lg"] },
           }}
         >
-          <Widgets />
+          <Widgets canShowPollWidget={canShowPollWidget} />
         </Box>
       )}
     </>

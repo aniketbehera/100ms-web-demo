@@ -92,6 +92,11 @@ const HLSView = () => {
       // parse payload and extract start_time and payload
       const duration = rest.duration;
       const parsedPayload = parsePayload(payload);
+
+      if (parsedPayload.showPollWidget === true) {
+        hmsActions.setAppData("showPollWidget", true);
+      }
+
       switch (parsedPayload.type) {
         case EMOJI_REACTION_TYPE:
           window.showFlyingEmoji(

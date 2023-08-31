@@ -3,8 +3,15 @@ import { Flex, VerticalDivider } from "@100mslive/roomkit-react";
 import { Logo, SpeakerTag } from "./HeaderComponents";
 import { ParticipantCount } from "./ParticipantList";
 import { StreamActions } from "./StreamActions";
+import { useHMSStore, selectLocalPeerRoleName } from "@100mslive/react-sdk";
 
 export const ConferencingHeader = ({ isPreview }) => {
+  const viewAttendeeButtonRolesList =
+    process.env.ATTENDEE_LIST_BUTTON_PERMISSION_ROLES;
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const shouldViewAttendeeListButton =
+    viewAttendeeButtonRolesList.includes(localPeerRole);
+
   return (
     <Flex
       justify="between"
@@ -26,7 +33,7 @@ export const ConferencingHeader = ({ isPreview }) => {
         }}
       >
         <StreamActions />
-        <ParticipantCount />
+        {shouldViewAttendeeListButton === true && <ParticipantCount />}
       </Flex>
     </Flex>
   );

@@ -95,23 +95,29 @@ const HLSView = () => {
 
       if (parsedPayload.showPollWidget === true) {
         hmsActions.setAppData("showPollWidget", true);
-      }
-
-      switch (parsedPayload.type) {
-        case EMOJI_REACTION_TYPE:
-          window.showFlyingEmoji(
-            parsedPayload?.emojiId,
-            parsedPayload?.senderId
-          );
-          break;
-        default: {
-          const toast = {
-            title: `Payload from timed Metadata ${parsedPayload}`,
-            duration: duration || 3000,
-          };
-          console.debug("Added toast ", JSON.stringify(toast));
-          ToastManager.addToast(toast);
-          break;
+        const toast = {
+          title: `A new poll has started.`,
+          duration: duration || 3000,
+        };
+        console.debug("Added toast ", JSON.stringify(toast));
+        ToastManager.addToast(toast);
+      } else {
+        switch (parsedPayload.type) {
+          case EMOJI_REACTION_TYPE:
+            window.showFlyingEmoji(
+              parsedPayload?.emojiId,
+              parsedPayload?.senderId
+            );
+            break;
+          default: {
+            const toast = {
+              title: `Payload from timed Metadata ${parsedPayload}`,
+              duration: duration || 3000,
+            };
+            console.debug("Added toast ", JSON.stringify(toast));
+            ToastManager.addToast(toast);
+            break;
+          }
         }
       }
     };

@@ -24,10 +24,10 @@ export const Widgets = props => {
   const { showWhiteboard } = useShowWhiteboard();
   const { showAudioShare } = useShowAudioShare();
 
-  const onClickShowPollData = () => {
-    console.log("Show Poll Data");
-    console.log(props.canShowPollWidget);
-  };
+  // const onClickShowPollData = () => {
+  //   console.log("Show Poll Data");
+  //   console.log(props.canShowPollWidget);
+  // };
 
   const renderPollVoting = () => {
     if (props.canShowPollWidget === true && widgetView === WIDGET_VIEWS.VOTE) {
@@ -66,7 +66,7 @@ export const Widgets = props => {
       {widgetView === WIDGET_VIEWS.CREATE_POLL_QUIZ && <PollsQuizMenu />}
       {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <CreateQuestions />}
       {renderPollVoting()}
-      <Button onClick={onClickShowPollData}>Print poll data</Button>
+      {/* <Button onClick={onClickShowPollData}>Print poll data</Button> */}
     </Container>
   );
 };

@@ -6,6 +6,7 @@ import {
   selectLocalPeerID,
   useHMSNotifications,
   useHMSStore,
+  selectAppData,
 } from "@100mslive/react-sdk";
 import { Button } from "@100mslive/roomkit-react";
 import { ToastBatcher } from "../Toast/ToastBatcher";
@@ -30,6 +31,7 @@ import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
+  const canShowPollWidget = useHMSStore(selectAppData("showPollWidget"));
   const notification = useHMSNotifications();
   const navigate = useNavigation();
   const HLS_VIEWER_ROLE = useHLSViewerRole();
@@ -164,25 +166,29 @@ export function Notifications() {
         break;
 
       case HMSNotificationTypes.POLL_STARTED:
-        if (notification.data.startedBy !== localPeerID) {
-          ToastManager.addToast({
-            title: `A poll was started: ${notification.data.title}`,
-            action: (
-              <Button
-                onClick={() => toggleWidget(notification.data.id)}
-                variant="standard"
-                css={{
-                  backgroundColor: "$surface_bright",
-                  fontWeight: "$semiBold",
-                  color: "$on_surface_high",
-                  p: "$xs $md",
-                }}
-              >
-                Vote
-              </Button>
-            ),
-          });
-        }
+        // if (
+        //   canShowPollWidget === true &&
+        //   notification.data.startedBy !== localPeerID
+        // ) {
+        //   ToastManager.addToast({
+        //     title: `A poll was started: ${notification.data.title}`,
+        //     action: (
+        //       <Button
+        //         onClick={() => toggleWidget(notification.data.id)}
+        //         variant="standard"
+        //         css={{
+        //           backgroundColor: "$surface_bright",
+        //           fontWeight: "$semiBold",
+        //           color: "$on_surface_high",
+        //           p: "$xs $md",
+        //         }}
+        //       >
+        //         Vote
+        //       </Button>
+        //     ),
+        //   });
+        // }
+
         break;
       default:
         break;

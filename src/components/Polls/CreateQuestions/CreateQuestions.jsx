@@ -51,6 +51,9 @@ export function CreateQuestions() {
 
     console.log("Timed Metadat sent");
     console.log(data);
+
+    //Sets showPollWidget true for local peer
+    actions.setAppData("showPollWidget", true);
     // console.log("Set showPollWidget to false");
 
     console.log("Timed Metadat sent");

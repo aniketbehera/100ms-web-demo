@@ -213,7 +213,7 @@ const PrevMenu = () => {
     >
       <Flex direction="column" css={{ w: "100%" }}>
         <Text variant="h6" css={{ c: "$on_surface_high" }}>
-          Previous Polls/Quiz
+          Polls/Quiz
         </Text>
         <Flex direction="column" css={{ gap: "$10", mt: "$8" }}>
           {canShowPollWidget === true &&

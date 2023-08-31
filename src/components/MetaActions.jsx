@@ -1,4 +1,8 @@
-import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
+import {
+  selectIsConnectedToRoom,
+  useHMSStore,
+  selectLocalPeerRoleName,
+} from "@100mslive/react-sdk";
 import { BrbIcon, HandIcon } from "@100mslive/react-icons";
 import { Flex, Tooltip } from "@100mslive/roomkit-react";
 import IconButton from "../IconButton";
@@ -11,6 +15,11 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
+  const raiseHandButtonRolesList =
+    process.env.RAISE_HAND_BUTTON_PERMISSION_ROLES;
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const shouldShowHandRaiseButton =
+    raiseHandButtonRolesList.includes(localPeerRole);
 
   if (!isConnected || (!isHandRaiseEnabled && !isBRBEnabled)) {
     return null;
@@ -18,7 +27,7 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
 
   return (
     <Flex align="center" css={{ gap: compact ? "$4" : "$8" }}>
-      {isHandRaiseEnabled && (
+      {shouldShowHandRaiseButton === true && isHandRaiseEnabled && (
         <Tooltip title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}>
           <IconButton
             onClick={toggleHandRaise}
@@ -29,6 +38,7 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
           </IconButton>
         </Tooltip>
       )}
+
       {isBRBEnabled && (
         <Tooltip title={isBRBOn ? `I'm back` : `I'll be right back`}>
           <IconButton

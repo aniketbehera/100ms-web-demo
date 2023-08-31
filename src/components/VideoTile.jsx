@@ -194,6 +194,7 @@ const PeerMetadata = ({ peerId }) => {
           <HandRaiseFilledIcon width={40} height={40} />
         </StyledVideoTile.AttributeBox>
       ) : null}
+
       {isBRB ? (
         <StyledVideoTile.AttributeBox
           css={metaStyles}

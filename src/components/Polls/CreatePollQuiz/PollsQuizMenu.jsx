@@ -6,6 +6,7 @@ import {
   selectPolls,
   useHMSActions,
   useHMSStore,
+  selectAppData,
 } from "@100mslive/react-sdk";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { Button, Flex, Input, Switch, Text } from "@100mslive/roomkit-react";
@@ -198,6 +199,7 @@ const AddMenu = () => {
 };
 
 const PrevMenu = () => {
+  const canShowPollWidget = useHMSStore(selectAppData("showPollWidget"));
   const polls = useHMSStore(selectPolls)?.filter(
     poll => poll.state === "started" || poll.state === "stopped"
   );
@@ -214,15 +216,16 @@ const PrevMenu = () => {
           Previous Polls/Quiz
         </Text>
         <Flex direction="column" css={{ gap: "$10", mt: "$8" }}>
-          {polls.map(poll => (
-            <InteractionCard
-              key={poll.id}
-              id={poll.id}
-              title={poll.title}
-              isLive={poll.state === "started"}
-              isTimed={(poll.duration || 0) > 0}
-            />
-          ))}
+          {canShowPollWidget === true &&
+            polls.map(poll => (
+              <InteractionCard
+                key={poll.id}
+                id={poll.id}
+                title={poll.title}
+                isLive={poll.state === "started"}
+                isTimed={(poll.duration || 0) > 0}
+              />
+            ))}
         </Flex>
       </Flex>
     </Flex>

@@ -56,7 +56,7 @@ export const StreamingLanding = () => {
       {permissions?.hlsStreaming && (
         <StreamCard
           testId="hls_stream"
-          title="Live Stream with HLS"
+          title="Start Live Stream"
           subtitle="Stream to millions, edit and control what the viewer sees and more!"
           css={{ my: "$8" }}
           onClick={() => setShowHLS(true)}

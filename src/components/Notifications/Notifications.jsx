@@ -168,6 +168,8 @@ export function Notifications() {
       case HMSNotificationTypes.POLL_STARTED:
         if (notification.data.startedBy !== localPeerID) {
           hmsActions.setAppData("showPollWidget", false);
+
+          
           // ToastManager.addToast({
           //   title: `A poll was started: ${notification.data.title}`,
           //   action: (

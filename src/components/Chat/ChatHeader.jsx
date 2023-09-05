@@ -15,11 +15,13 @@ import {
 import { ChatSelector } from "./ChatSelector";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
+import {useChatRoleSelector} from "./useChatRoleSelector";
 
 export const ChatHeader = React.memo(
   ({ selection, selectorOpen, onToggle, onSelect, role, peerId }) => {
     const [open, setOpen] = useState(false);
     const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+    const fixedRole = useChatRoleSelector();
     return (
       <Flex
         onClick={onToggle}
@@ -31,6 +33,7 @@ export const ChatHeader = React.memo(
         }}
       >
         <Text variant="h6">Chat </Text>
+        {!!!fixedRole &&
         <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
           <Dropdown.Trigger
             asChild
@@ -68,7 +71,7 @@ export const ChatHeader = React.memo(
           >
             <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
           </Dropdown.Content>
-        </Dropdown.Root>
+        </Dropdown.Root>}
         <IconButton
           css={{ ml: "auto" }}
           onClick={e => {

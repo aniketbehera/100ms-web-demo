@@ -16,6 +16,7 @@ import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import { useSetSubscribedChatSelector } from "../AppData/useUISettings";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
+import { useChatRoleSelector } from "./useChatRoleSelector";
 import { useUnreadCount } from "./useUnreadCount";
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from "../../common/constants";
 
@@ -62,6 +63,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 };
 
 export const Chat = () => {
+  const fixedRole = useChatRoleSelector();
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(
     CHAT_SELECTOR.PEER_ID
@@ -143,8 +145,8 @@ export const Chat = () => {
         scrollToBottom={scrollToBottom}
       />
       <ChatFooter
-        role={chatOptions.role}
-        peerId={chatOptions.peerId}
+        role={fixedRole ? fixedRole : chatOptions.role}
+        peerId={fixedRole ? "" : chatOptions.peerId}
         onSend={() => scrollToBottom(1)}
       >
         {!isSelectorOpen && (

@@ -65,9 +65,9 @@ export const Logo = () => {
       src={
         logo ||
         (themeType === "dark"
-          ? require("../../images/logo-light.svg")
-          : require("../../images/logo-dark.svg"))
-      }
+          ? process.env.REACT_APP_LOGO_LIGHT
+          : process.env.REACT_APP_LOGO_LIGHT
+      )}
       alt="Brand Logo"
       width={132}
       height={40}

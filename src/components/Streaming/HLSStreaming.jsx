@@ -150,6 +150,7 @@ const StartHLS = () => {
   const [record, setRecord] = useState(false);
   const [error, setError] = useState(false);
   const hmsActions = useHMSActions();
+  const roomId=useHMSStore(selectRoomID);
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(
     async variants => {
@@ -160,7 +161,8 @@ const StartHLS = () => {
         setHLSStarted(true);
         setError("");
         await hmsActions.startHLSStreaming({
-          variants,
+          // This will fail in local dev
+          variants:[{meetingURL:`${window.location.origin}/preview/${roomId}/custom-internal-hls-viewer?skip_preview=true`}],
           recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {

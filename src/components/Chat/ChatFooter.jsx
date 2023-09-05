@@ -80,7 +80,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     }
     try {
       if (role) {
-        await hmsActions.sendGroupMessage(message, [role]);
+        await Array.isArray(role)?hmsActions.sendGroupMessage(message, role):hmsActions.sendGroupMessage(message, [role]);
       } else if (peerId) {
         await hmsActions.sendDirectMessage(message, peerId);
       } else {

@@ -5,6 +5,12 @@ export const useChatRoleSelector = () => {
   const localRoleName = useHMSStore(selectLocalPeerRoleName);
   const roleMap = JSON.parse(process.env.REACT_APP_CHAT_ROLE_MAPS);
   console.log(roleMap);
-  const fixedRole = roleMap && localRoleName ? roleMap[localRoleName] : false;
+  const fixedRole =
+    roleMap &&
+    localRoleName &&
+    roleMap[localRoleName] &&
+    roleMap[localRoleName].sendTo
+      ? roleMap[localRoleName].sendTo
+      : false;
   return fixedRole;
 };

@@ -16,7 +16,7 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const raiseHandButtonRolesList =
-    process.env.RAISE_HAND_BUTTON_PERMISSION_ROLES;
+    process.env.REACT_APP_RAISE_HAND_BUTTON_PERMISSION_ROLES;
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const shouldShowHandRaiseButton =
     raiseHandButtonRolesList.includes(localPeerRole);

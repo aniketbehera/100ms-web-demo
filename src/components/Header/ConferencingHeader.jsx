@@ -7,7 +7,7 @@ import { useHMSStore, selectLocalPeerRoleName } from "@100mslive/react-sdk";
 
 export const ConferencingHeader = ({ isPreview }) => {
   const viewAttendeeButtonRolesList =
-    process.env.ATTENDEE_LIST_BUTTON_PERMISSION_ROLES;
+    process.env.REACT_APP_ATTENDEE_LIST_BUTTON_PERMISSION_ROLES;
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const shouldViewAttendeeListButton =
     viewAttendeeButtonRolesList.includes(localPeerRole);

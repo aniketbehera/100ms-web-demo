@@ -234,9 +234,17 @@ export const useShowWhiteboard = () => {
   const isWhiteboardFeatureEnabled = useIsFeatureEnabled(
     FEATURE_LIST.WHITEBOARD
   );
+  const whiteboardRolesList =
+    process.env.REACT_APP_SHOW_AUDIO_SHARE_BUTTON_PERMISSION_ROLES;
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
+  // TODO handle array not present error
+  const isRoleAllowedToShareWhiteBoard =
+    whiteboardRolesList.includes(localPeerRoleName);
+
   const showWhiteboard = useMemo(() => {
     return !(
       !whiteboardEnabled ||
+      !isRoleAllowedToShareWhiteBoard ||
       hlsViewerRole === localPeerRole ||
       !isWhiteboardFeatureEnabled
     );
@@ -245,6 +253,7 @@ export const useShowWhiteboard = () => {
     isWhiteboardFeatureEnabled,
     localPeerRole,
     whiteboardEnabled,
+    isRoleAllowedToShareWhiteBoard,
   ]);
   return {
     showWhiteboard: showWhiteboard,
@@ -255,14 +264,25 @@ export const useShowAudioShare = () => {
   const isAudioShareFeatureEnabled = useIsFeatureEnabled(
     FEATURE_LIST.AUDIO_ONLY_SCREENSHARE
   );
+  // TODO handle array not present error
+  const audioShareRolesList =
+    process.env.REACT_APP_SHOW_AUDIO_SHARE_BUTTON_PERMISSION_ROLES;
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
+  const isRoleAllowedToShareAudio =
+    audioShareRolesList.includes(localPeerRoleName);
 
   const showAudioShare = useMemo(() => {
     return !(
+      !isRoleAllowedToShareAudio ||
       !isAudioShareFeatureEnabled ||
       !isAllowedToPublish.screen ||
       !isScreenshareSupported()
     );
-  }, [isAllowedToPublish.screen, isAudioShareFeatureEnabled]);
+  }, [
+    isAllowedToPublish.screen,
+    isAudioShareFeatureEnabled,
+    isRoleAllowedToShareAudio,
+  ]);
 
   return {
     showAudioShare: showAudioShare,

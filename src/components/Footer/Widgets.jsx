@@ -42,7 +42,7 @@ export const Widgets = props => {
         <Flex direction="column" css={{ p: "$10" }}>
           {(showWhiteboard || showAudioShare) && (
             <Flex css={{ gap: "$10", mb: "$12" }}>
-              <ScreenshareAudio />
+              {/* TODO delink both features in UI <ScreenshareAudio /> */}
               <ToggleWhiteboard />
             </Flex>
           )}

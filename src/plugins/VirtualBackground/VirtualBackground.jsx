@@ -16,7 +16,7 @@ import { VirtualBackgroundIcon } from "@100mslive/react-icons";
 import { Loading, Tooltip } from "@100mslive/roomkit-react";
 import IconButton from "../../IconButton";
 import { useIsFeatureEnabled } from "../../components/hooks/useFeatures";
-import { getRandomVirtualBackground } from "./vbutils";
+import { getStaticVirtualBackground } from "./vbutils";
 import { FEATURE_LIST } from "../../common/constants";
 
 export const VirtualBackground = () => {
@@ -57,7 +57,7 @@ export const VirtualBackground = () => {
     try {
       await createPlugin();
       window.HMS.virtualBackground = pluginRef.current;
-      const { background, backgroundType } = getRandomVirtualBackground();
+      const { background, backgroundType } = getStaticVirtualBackground();
       await pluginRef.current.setBackground(background, backgroundType);
       await hmsActions.addPluginToVideoTrack(
         pluginRef.current,

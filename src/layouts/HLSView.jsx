@@ -97,27 +97,26 @@ const HLSView = () => {
 
       if (parsedPayload.showPollWidget === true) {
         hmsActions.setAppData("showPollWidget", true);
-        const toast = {
-          title: `A new poll has started.`,
-          duration: duration || 3000,
-        };
-        console.debug("Added toast ", JSON.stringify(toast));
         ToastManager.addToast({
           title: `A poll was started.`,
           // ${notification.data.title}
+
           action: (
-            <Button
-              onClick={() => toggleWidget(parsedPayload.pollID)}
-              variant="standard"
-              css={{
-                backgroundColor: "$surface_bright",
-                fontWeight: "$semiBold",
-                color: "$on_surface_high",
-                p: "$xs $md",
-              }}
-            >
+            <button onClick={() => toggleWidget(parsedPayload.pollID)}>
               Vote
-            </Button>
+            </button>
+            // <Button
+
+            //   variant="standard"
+            //   css={{
+            //     backgroundColor: "$surface_bright",
+            //     fontWeight: "$semiBold",
+            //     color: "$on_surface_high",
+            //     p: "$xs $md",
+            //   }}
+            // >
+
+            // </Button>
           ),
         });
       } else {

@@ -5,7 +5,7 @@ import {
   selectPollByID,
   useHMSActions,
   useHMSStore,
-  useRecordingStreaming
+  useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { AddCircleIcon } from "@100mslive/react-icons";
 import { Button, Flex, Text } from "@100mslive/roomkit-react";
@@ -44,18 +44,18 @@ export function CreateQuestions() {
     await actions.interactivityCenter.startPoll(id);
 
     if (isHLSRunning) {
-    // Send Timed Metadata event for a Poll created only when HLS is running.
-    const data = { showPollWidget: true };
-    await actions.sendHLSTimedMetadata([
-      {
-        payload: JSON.stringify(data),
-        duration: 2,
-      },
-    ]);
-    console.log("Poll created and Timed Metadata sent");
-    console.log(data);
-    //Sets showPollWidget true for local peer
-    actions.setAppData("showPollWidget", true);
+      // Send Timed Metadata event for a Poll created only when HLS is running.
+      const data = { showPollWidget: true, pollID: id };
+      await actions.sendHLSTimedMetadata([
+        {
+          payload: JSON.stringify(data),
+          duration: 2,
+        },
+      ]);
+      console.log("Poll created and Timed Metadata sent");
+      console.log(data);
+      //Sets showPollWidget true for local peer
+      actions.setAppData("showPollWidget", true);
     }
 
     setWidgetView(WIDGET_VIEWS.VOTE);

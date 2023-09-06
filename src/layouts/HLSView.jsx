@@ -29,6 +29,7 @@ import { HLSAutoplayBlockedPrompt } from "../components/HMSVideo/HLSAutoplayBloc
 import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
 import { ToastManager } from "../components/Toast/ToastManager";
 import { APP_DATA, EMOJI_REACTION_TYPE } from "../common/constants";
+import { useWidgetToggle } from "../components/AppData/useSidepane";
 
 let hlsPlayer;
 
@@ -53,6 +54,7 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   const [showLoader, setShowLoader] = useState(false);
+  const toggleWidget = useWidgetToggle();
 
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
@@ -100,7 +102,24 @@ const HLSView = () => {
           duration: duration || 3000,
         };
         console.debug("Added toast ", JSON.stringify(toast));
-        ToastManager.addToast(toast);
+        ToastManager.addToast({
+          title: `A poll was started.`,
+          // ${notification.data.title}
+          action: (
+            <Button
+              onClick={() => toggleWidget(parsedPayload.pollID)}
+              variant="standard"
+              css={{
+                backgroundColor: "$surface_bright",
+                fontWeight: "$semiBold",
+                color: "$on_surface_high",
+                p: "$xs $md",
+              }}
+            >
+              Vote
+            </Button>
+          ),
+        });
       } else {
         switch (parsedPayload.type) {
           case EMOJI_REACTION_TYPE:

@@ -17,6 +17,7 @@ import {
   Box,
   Flex,
   IconButton,
+  Button,
   Loading,
   Text,
   Tooltip,
@@ -102,21 +103,18 @@ const HLSView = () => {
           // ${notification.data.title}
 
           action: (
-            <button onClick={() => toggleWidget(parsedPayload.pollID)}>
+            <Button
+              onClick={() => toggleWidget(true)}
+              variant="standard"
+              css={{
+                backgroundColor: "$surface_bright",
+                fontWeight: "$semiBold",
+                color: "$on_surface_high",
+                p: "$xs $md",
+              }}
+            >
               Vote
-            </button>
-            // <Button
-
-            //   variant="standard"
-            //   css={{
-            //     backgroundColor: "$surface_bright",
-            //     fontWeight: "$semiBold",
-            //     color: "$on_surface_high",
-            //     p: "$xs $md",
-            //   }}
-            // >
-
-            // </Button>
+            </Button>
           ),
         });
       } else {

@@ -104,7 +104,7 @@ const HLSView = () => {
 
           action: (
             <Button
-              onClick={() => toggleWidget(true)}
+              onClick={() => toggleWidget(parsedPayload.pollID)}
               variant="standard"
               css={{
                 backgroundColor: "$surface_bright",

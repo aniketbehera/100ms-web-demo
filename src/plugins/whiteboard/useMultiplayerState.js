@@ -1,5 +1,6 @@
 // @ts-check
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Utils } from "@tldraw/core";
 import { selectDidIJoinWithin, useHMSStore } from "@100mslive/react-sdk";
 import { provider as room } from "./PusherCommunicationProvider";
 import { WhiteboardEvents as Events } from "./WhiteboardEvents";
@@ -29,6 +30,39 @@ export function useMultiplayerState(roomId) {
    */
   const rLiveShapes = useRef(new Map());
   const rLiveBindings = useRef(new Map());
+
+  const keepSelectedShapesInViewport = app => {
+    if (!app) return;
+    const { selectedIds } = app;
+    if (selectedIds.length <= 0) return;
+
+    // Get the selected shapes
+    const shapes = selectedIds.map(id => app.getShape(id));
+
+    // Get the bounds of the selected shapes
+    const bounds = Utils.getCommonBounds(
+      shapes.map(shape => app.getShapeUtil(shape).getBounds(shape))
+    );
+
+    // Define the min/max x/y (here we're using the viewport but
+    // we could use any arbitrary bounds)
+    const { minX, minY, maxX, maxY } = app.viewport;
+
+    // Check for any overlaps between the viewport and the selection bounding box
+    let ox = Math.min(bounds.minX, minX) || Math.max(bounds.maxX - maxX, 0);
+    let oy = Math.min(bounds.minY, minY) || Math.max(bounds.maxY - maxY, 0);
+
+    // If there's any overlaps, then update the shapes so that
+    // there is no longer any overlap.
+    if (ox !== 0 || oy !== 0) {
+      app.updateShapes(
+        ...shapes.map(shape => ({
+          id: shape.id,
+          point: [shape.point[0] - ox, shape.point[1] - oy],
+        }))
+      );
+    }
+  };
 
   const getCurrentState = useCallback(() => {
     return {
@@ -175,6 +209,7 @@ export function useMultiplayerState(roomId) {
   const onChangePage = useCallback(
     (_app, shapes, bindings, _assets) => {
       updateLocalState({ shapes, bindings });
+      keepSelectedShapesInViewport(app);
       room.broadcastEvent(Events.STATE_CHANGE, { shapes, bindings });
 
       /**
@@ -187,7 +222,7 @@ export function useMultiplayerState(roomId) {
        */
       applyStateToBoard(getCurrentState());
     },
-    [updateLocalState, applyStateToBoard, getCurrentState]
+    [updateLocalState, applyStateToBoard, getCurrentState, app]
   );
 
   // Handle presence updates when the user's pointer / selection changes

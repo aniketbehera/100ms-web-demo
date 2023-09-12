@@ -1,6 +1,6 @@
 // @ts-check
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Utils } from "@tldraw/core";
+//import { Utils } from "@tldraw/core";
 import { selectDidIJoinWithin, useHMSStore } from "@100mslive/react-sdk";
 import { provider as room } from "./PusherCommunicationProvider";
 import { WhiteboardEvents as Events } from "./WhiteboardEvents";
@@ -22,6 +22,8 @@ const useWhiteboardState = () => {
  */
 export function useMultiplayerState(roomId) {
   const [app, setApp] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const [point, setPoint] = useState([0, 0]);
   const [isReady, setIsReady] = useState(false);
   const { amIWhiteboardOwner, shouldRequestState } = useWhiteboardState();
 
@@ -31,38 +33,38 @@ export function useMultiplayerState(roomId) {
   const rLiveShapes = useRef(new Map());
   const rLiveBindings = useRef(new Map());
 
-  const keepSelectedShapesInViewport = app => {
-    if (!app) return;
-    const { selectedIds } = app;
-    if (selectedIds.length <= 0) return;
+  // const keepSelectedShapesInViewport = app => {
+  //   if (!app) return;
+  //   const { selectedIds } = app;
+  //   if (selectedIds.length <= 0) return;
 
-    // Get the selected shapes
-    const shapes = selectedIds.map(id => app.getShape(id));
+  //   // Get the selected shapes
+  //   const shapes = selectedIds.map(id => app.getShape(id));
 
-    // Get the bounds of the selected shapes
-    const bounds = Utils.getCommonBounds(
-      shapes.map(shape => app.getShapeUtil(shape).getBounds(shape))
-    );
+  //   // Get the bounds of the selected shapes
+  //   const bounds = Utils.getCommonBounds(
+  //     shapes.map(shape => app.getShapeUtil(shape).getBounds(shape))
+  //   );
 
-    // Define the min/max x/y (here we're using the viewport but
-    // we could use any arbitrary bounds)
-    const { minX, minY, maxX, maxY } = app.viewport;
+  //   // Define the min/max x/y (here we're using the viewport but
+  //   // we could use any arbitrary bounds)
+  //   const { minX, minY, maxX, maxY } = app.viewport;
 
-    // Check for any overlaps between the viewport and the selection bounding box
-    let ox = Math.min(bounds.minX, minX) || Math.max(bounds.maxX - maxX, 0);
-    let oy = Math.min(bounds.minY, minY) || Math.max(bounds.maxY - maxY, 0);
+  //   // Check for any overlaps between the viewport and the selection bounding box
+  //   let ox = Math.min(bounds.minX, minX) || Math.max(bounds.maxX - maxX, 0);
+  //   let oy = Math.min(bounds.minY, minY) || Math.max(bounds.maxY - maxY, 0);
 
-    // If there's any overlaps, then update the shapes so that
-    // there is no longer any overlap.
-    if (ox !== 0 || oy !== 0) {
-      app.updateShapes(
-        ...shapes.map(shape => ({
-          id: shape.id,
-          point: [shape.point[0] - ox, shape.point[1] - oy],
-        }))
-      );
-    }
-  };
+  //   // If there's any overlaps, then update the shapes so that
+  //   // there is no longer any overlap.
+  //   if (ox !== 0 || oy !== 0) {
+  //     app.updateShapes(
+  //       ...shapes.map(shape => ({
+  //         id: shape.id,
+  //         point: [shape.point[0] - ox, shape.point[1] - oy],
+  //       }))
+  //     );
+  //   }
+  // };
 
   const getCurrentState = useCallback(() => {
     return {
@@ -72,12 +74,14 @@ export function useMultiplayerState(roomId) {
       bindings: rLiveBindings.current
         ? Object.fromEntries(rLiveBindings.current)
         : {},
+      camera: app && app.camera,
     };
-  }, []);
+  }, [app]);
 
   const sendDataInStream = useCallback(() => {
     const shapesIterator = rLiveShapes.current?.entries();
     const bindingsIterator = rLiveBindings.current?.entries();
+    const camera = { point: point, zoom: zoom };
     let initial = true;
     // it will run until shapes and binding data is broadcast
     for (;;) {
@@ -92,6 +96,7 @@ export function useMultiplayerState(roomId) {
         room.broadcastEvent(Events.CURRENT_STATE, {
           shapes: shape,
           bindings: binding,
+          camera: camera,
         });
         initial = false;
         continue;
@@ -99,9 +104,10 @@ export function useMultiplayerState(roomId) {
       room.broadcastEvent(Events.STATE_CHANGE, {
         shapes: shape,
         bindings: binding,
+        camera: camera,
       });
     }
-  }, []);
+  }, [point, zoom]);
   const sendCurrentState = useCallback(() => {
     // TODO - add data chunking
     if (amIWhiteboardOwner && isReady) {
@@ -109,34 +115,56 @@ export function useMultiplayerState(roomId) {
     }
   }, [amIWhiteboardOwner, isReady, sendDataInStream]);
 
-  const updateLocalState = useCallback(({ shapes, bindings, merge = true }) => {
-    if (!(shapes && bindings)) return;
+  const updateLocalState = useCallback(
+    ({ shapes, bindings, camera, merge = true }) => {
+      if (!(shapes && bindings && camera)) {
+        console.log("Returning because shapes and bindings are empty");
+        return;
+      }
 
-    if (merge) {
-      const lShapes = rLiveShapes.current;
-      const lBindings = rLiveBindings.current;
-
-      if (!(lShapes && lBindings)) return;
-      Object.entries(shapes).forEach(([id, shape]) => {
-        if (!shape) {
-          lShapes.delete(id);
-        } else {
-          lShapes.set(shape.id, shape);
+      if (merge) {
+        console.log("Trying to change state in response to remote change");
+        if (app) {
+          console.log(
+            "app exists so applying camera change" +
+              camera.point +
+              " " +
+              camera.zoom
+          );
+          if (!amIWhiteboardOwner) {
+            app.setCamera(camera.point, camera.zoom, "Remote change");
+          }
         }
-      });
+        const lShapes = rLiveShapes.current;
+        const lBindings = rLiveBindings.current;
 
-      Object.entries(bindings).forEach(([id, binding]) => {
-        if (!binding) {
-          lBindings.delete(id);
-        } else {
-          lBindings.set(binding.id, binding);
+        if (!(lShapes && lBindings)) return;
+        Object.entries(shapes).forEach(([id, shape]) => {
+          if (!shape) {
+            lShapes.delete(id);
+          } else {
+            lShapes.set(shape.id, shape);
+          }
+        });
+
+        Object.entries(bindings).forEach(([id, binding]) => {
+          if (!binding) {
+            lBindings.delete(id);
+          } else {
+            lBindings.set(binding.id, binding);
+          }
+        });
+      } else {
+        if (!amIWhiteboardOwner) {
+          app.setCamera(camera.point, camera.zoom, "Remote change");
         }
-      });
-    } else {
-      rLiveShapes.current = new Map(Object.entries(shapes));
-      rLiveBindings.current = new Map(Object.entries(bindings));
-    }
-  }, []);
+        console.log("In else block of updateLocalState");
+        rLiveShapes.current = new Map(Object.entries(shapes));
+        rLiveBindings.current = new Map(Object.entries(bindings));
+      }
+    },
+    [app, amIWhiteboardOwner]
+  );
 
   const applyStateToBoard = useCallback(
     state => {
@@ -156,11 +184,12 @@ export function useMultiplayerState(roomId) {
       if (!state) {
         return;
       }
-
-      const { shapes, bindings, eventName } = state;
+      console.log("Getting remote changes" + JSON.stringify(state));
+      const { shapes, bindings, camera, eventName } = state;
       updateLocalState({
         shapes,
         bindings,
+        camera,
         merge: eventName === Events.STATE_CHANGE,
       });
       applyStateToBoard(getCurrentState());
@@ -199,7 +228,7 @@ export function useMultiplayerState(roomId) {
     app => {
       app.loadRoom(roomId);
       app.pause(); // Turn off the app's own undo / redo stack
-      // window.app = app;
+      window.app = app;
       setApp(app);
     },
     [roomId]
@@ -208,9 +237,10 @@ export function useMultiplayerState(roomId) {
   // Update the live shapes when the app's shapes change.
   const onChangePage = useCallback(
     (_app, shapes, bindings, _assets) => {
-      updateLocalState({ shapes, bindings });
-      keepSelectedShapesInViewport(app);
-      room.broadcastEvent(Events.STATE_CHANGE, { shapes, bindings });
+      const camera = { point: point, zoom: zoom };
+      updateLocalState({ shapes, bindings, camera });
+      //keepSelectedShapesInViewport(app);
+      room.broadcastEvent(Events.STATE_CHANGE, { shapes, bindings, camera });
 
       /**
        * Tldraw thinks that the next update passed to replacePageContent after onChangePage is the own update triggered by onChangePage
@@ -222,13 +252,41 @@ export function useMultiplayerState(roomId) {
        */
       applyStateToBoard(getCurrentState());
     },
-    [updateLocalState, applyStateToBoard, getCurrentState, app]
+    [updateLocalState, applyStateToBoard, getCurrentState, point, zoom]
   );
 
-  // Handle presence updates when the user's pointer / selection changes
-  // const onChangePresence = useCallback((app, user) => {
-  //   updateMyPresence({ id: app.room?.userId, user });
-  // }, [][updateMyPresence]);
+  const updateCamera = useCallback(
+    camera => {
+      setPoint(camera.point);
+      setZoom(camera.zoom);
+      console.log("New point, new zoom" + zoom + " " + point);
+    },
+    [point, zoom]
+  );
+
+  //Handle presence updates when the user's pointer / selection changes
+  const onChangePresence = useCallback(
+    app => {
+      app.camera.zoom &&
+        app.camera.point &&
+        app.camera.point[0] &&
+        (app.camera.point[0] !== point[0] ||
+          app.camera.point[1] !== point[1] ||
+          app.camera.zoom !== zoom) &&
+        updateCamera(app.camera);
+      //console.log("Presence changed sd" + JSON.stringify(app.camera));
+      //updateMyPresence({ id: app.room?.userId, user });
+    },
+    [point, updateCamera, zoom]
+  );
+
+  const onZoom = useCallback(app => {
+    console.log("Zoomed");
+  }, []);
+
+  const onPan = useCallback(app => {
+    console.log("Panned");
+  }, []);
 
   // Subscriptions and initial setup
   useEffect(() => {
@@ -273,5 +331,5 @@ export function useMultiplayerState(roomId) {
     return handleUnmount;
   }, [isReady, shouldRequestState, getCurrentState]);
 
-  return { onMount, onChangePage };
+  return { onMount, onChangePage, onChangePresence, onZoom, onPan };
 }
